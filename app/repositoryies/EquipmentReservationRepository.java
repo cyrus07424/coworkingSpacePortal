@@ -4,7 +4,7 @@ import io.ebean.DB;
 import models.Equipment;
 import models.EquipmentReservation;
 import models.User;
-import services.DatabaseExecutionContext;
+import repositoryies.DatabaseExecutionContext;
 
 import javax.inject.Inject;
 import java.time.LocalDate;

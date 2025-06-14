@@ -34,6 +34,6 @@ POST        /equipment/:id/edit       controllers.EquipmentController.edit(reque
 GET         /equipment/:id/delete     controllers.EquipmentController.delete(request: Request, id: Long)
 
 # Equipment reservation routes
-GET         /equipment-reservations   controllers.EquipmentReservationController.index(request: Request)
-POST        /equipment-reservations   controllers.EquipmentReservationController.reserve(request: Request)
-GET         /equipment-reservations/:id/cancel   controllers.EquipmentReservationController.cancel(request: Request, id: Long)
+GET         /reservations             controllers.EquipmentReservationController.index(request: Request)
+POST        /reservations             controllers.EquipmentReservationController.reserve(request: Request)
+GET         /reservations/:id/cancel  controllers.EquipmentReservationController.cancel(request: Request, id: Long)
