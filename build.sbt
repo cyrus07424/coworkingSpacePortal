@@ -26,7 +26,7 @@ lazy val root = (project in file("."))
       "-Xlint:deprecation"
     ),
     // Enable annotation processing for Lombok
-    Compile / compile / javacOptions ++= Seq(
+    javacOptions ++= Seq(
       "-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor"
     ),
     (Test / javaOptions) += "-Dtestserver.port=19001",
