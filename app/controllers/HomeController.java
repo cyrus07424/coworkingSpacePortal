@@ -10,6 +10,7 @@ import views.html.common.dashboard;
 import views.html.common.index;
 
 import javax.inject.Inject;
+import java.util.Optional;
 
 /**
  * This controller contains an action to handle HTTP requests
@@ -30,7 +31,7 @@ public class HomeController extends Controller {
     public Result index(Http.Request request) {
         // Check if user is authenticated
         if (request.session().get("userId").isPresent()) {
-            return dashboard(request);
+            return redirect(routes.HomeController.dashboard());
         } else {
             return ok(index.render());
         }
