@@ -105,4 +105,12 @@ public class User extends BaseModel {
     public boolean canCreateStaff() {
         return isAdmin();
     }
+
+    public boolean canManageEquipment() {
+        return isAdmin() || isStaff();
+    }
+
+    public boolean canReserveEquipment() {
+        return isCustomer();
+    }
 }

@@ -1,0 +1,117 @@
+@(equipmentList: List[models.Equipment], reservations: List[models.EquipmentReservation], reservationForm: Form[forms.EquipmentReservationForm], currentUser: models.User)(implicit request: Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@implicitField: FieldConstructor = @{
+    FieldConstructor(tags.forms.field_constructor.render)
+}
+
+@mainWithUser(currentUser) {
+
+    @request.flash.asScala().get("success").map { successFlashValue =>
+        <div class="alert alert-success" role="alert">
+            @successFlashValue
+        </div>
+    }
+
+    @request.flash.asScala().get("error").map { errorFlashValue =>
+        <div class="alert alert-danger" role="alert">
+            @errorFlashValue
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>備品予約</h4>
+                </div>
+                <div class="card-body">
+                    @form(action = routes.EquipmentReservationController.reserve()) {
+                        @CSRF.formField
+                        
+                        <div class="form-group">
+                            <label for="equipmentId">備品</label>
+                            <select name="equipmentId" id="equipmentId" class="form-control" required>
+                                <option value="">-- 備品を選択 --</option>
+                                @for(equipment <- equipmentList) {
+                                    <option value="@equipment.getId()" @if(reservationForm("equipmentId").value.contains(equipment.getId().toString)) {selected}>
+                                        @equipment.getName() (@equipment.getCategory().getDisplayName())
+                                    </option>
+                                }
+                            </select>
+                            @if(reservationForm("equipmentId").hasErrors) {
+                                <div class="text-danger">
+                                    @for(error <- reservationForm("equipmentId").errors) {
+                                        @error.message
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @inputDate(reservationForm("reservationDate"), 
+                            Symbol("_label") -> "予約日", 
+                            Symbol("_help") -> "使用したい日付を選択してください",
+                            Symbol("class") -> "form-control",
+                            Symbol("required") -> "true",
+                            Symbol("min") -> java.time.LocalDate.now().toString())
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">予約する</button>
+                        </div>
+                        
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>予約履歴</h4>
+                </div>
+                <div class="card-body">
+                    @if(reservations.isEmpty) {
+                        <p>予約がありません。</p>
+                    } else {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>備品</th>
+                                        <th>予約日</th>
+                                        <th>状態</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for(reservation <- reservations) {
+                                        <tr>
+                                            <td>@reservation.getEquipment().getName()</td>
+                                            <td>@reservation.getReservationDate()</td>
+                                            <td>
+                                                @if(reservation.isActive()) {
+                                                    <span class="badge badge-success">@reservation.getStatus().getDisplayName()</span>
+                                                } else {
+                                                    <span class="badge badge-secondary">@reservation.getStatus().getDisplayName()</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if(reservation.isActive()) {
+                                                    <a href="@routes.EquipmentReservationController.cancel(reservation.getId())" 
+                                                       class="btn btn-sm btn-outline-danger"
+                                                       onclick="return confirm('予約をキャンセルしますか？');">キャンセル</a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
