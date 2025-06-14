@@ -1,0 +1,68 @@
+@(createStaffForm: Form[forms.CreateStaffForm])(implicit request: Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@implicitField: FieldConstructor = @{
+    FieldConstructor(tags.forms.field_constructor.render)
+}
+
+@main {
+
+    @request.flash.asScala().get("error").map { errorFlashValue =>
+        <div class="alert alert-danger" role="alert">
+            @errorFlashValue
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h3>スタッフユーザー作成</h3>
+                </div>
+                <div class="card-body">
+
+                    @form(action = routes.UserManagementController.createStaff()) {
+
+                        @if(createStaffForm.hasGlobalErrors) {
+                            <div class="alert alert-danger">
+                            @for(error <- createStaffForm.globalErrors) {
+                                @error.message
+                            }
+                            </div>
+                        }
+
+                        @if(!createStaffForm.value.map(f => f.passwordsMatch()).getOrElse(true)) {
+                            <div class="alert alert-danger">
+                                パスワードが一致しません
+                            </div>
+                        }
+
+                        @CSRF.formField
+
+                        <div class="form-group mb-3">
+                        @inputText(createStaffForm("username"), Symbol("_label") -> "ユーザー名", Symbol("class") -> "form-control")
+                        </div>
+
+                        <div class="form-group mb-3">
+                        @inputText(createStaffForm("email"), Symbol("_label") -> "メールアドレス", Symbol("class") -> "form-control")
+                        </div>
+
+                        <div class="form-group mb-3">
+                        @inputPassword(createStaffForm("password"), Symbol("_label") -> "パスワード", Symbol("class") -> "form-control")
+                        </div>
+
+                        <div class="form-group mb-3">
+                        @inputPassword(createStaffForm("confirmPassword"), Symbol("_label") -> "パスワード確認", Symbol("class") -> "form-control")
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">スタッフを作成</button>
+                        <a href="@routes.UserManagementController.index()" class="btn btn-secondary">キャンセル</a>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

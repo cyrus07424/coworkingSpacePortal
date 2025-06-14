@@ -18,3 +18,8 @@ POST        /login                    controllers.AuthController.login(request: 
 GET         /register                 controllers.AuthController.showRegister(request: Request)
 POST        /register                 controllers.AuthController.register(request: Request)
 GET         /logout                   controllers.AuthController.logout(request: Request)
+
+# User management routes
+GET         /users                    controllers.UserManagementController.index(request: Request)
+GET         /users/create-staff       controllers.UserManagementController.showCreateStaff(request: Request)
+POST        /users/create-staff       controllers.UserManagementController.createStaff(request: Request)

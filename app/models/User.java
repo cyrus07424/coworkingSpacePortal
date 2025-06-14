@@ -1,6 +1,8 @@
 package models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Table;
 import org.mindrot.jbcrypt.BCrypt;
 import play.data.validation.Constraints;
@@ -27,13 +29,25 @@ public class User extends BaseModel {
     @Constraints.MinLength(6)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
     public User() {
+        this.role = UserRole.CUSTOMER; // Default role
     }
 
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.setPassword(password);
+        this.role = UserRole.CUSTOMER; // Default role for new users
+    }
+
+    public User(String username, String email, String password, UserRole role) {
+        this.username = username;
+        this.email = email;
+        this.setPassword(password);
+        this.role = role;
     }
 
     public String getUsername() {
@@ -62,5 +76,33 @@ public class User extends BaseModel {
 
     public boolean checkPassword(String password) {
         return BCrypt.checkpw(password, this.password);
+    }
+
+    public UserRole getRole() {
+        return role != null ? role : UserRole.CUSTOMER;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    public boolean isAdmin() {
+        return UserRole.ADMIN.equals(getRole());
+    }
+
+    public boolean isStaff() {
+        return UserRole.STAFF.equals(getRole());
+    }
+
+    public boolean isCustomer() {
+        return UserRole.CUSTOMER.equals(getRole());
+    }
+
+    public boolean canManageUsers() {
+        return isAdmin() || isStaff();
+    }
+
+    public boolean canCreateStaff() {
+        return isAdmin();
     }
 }

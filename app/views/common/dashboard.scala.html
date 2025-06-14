@@ -1,0 +1,47 @@
+@(user: models.User)
+
+@mainWithUser(user) {
+    <div class="row">
+        <div class="col-12">
+            <h1>ダッシュボード</h1>
+            <p>ようこそ、@user.getUsername() さん (@user.getRole().getDisplayName())</p>
+
+            @if(user.isCustomer()) {
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">座席予約</h5>
+                                <p class="card-text">コワーキングスペースの座席を予約できます。</p>
+                                <a href="#" class="btn btn-primary">座席を予約する</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">備品レンタル予約</h5>
+                                <p class="card-text">必要な備品をレンタル予約できます。</p>
+                                <a href="#" class="btn btn-primary">備品を予約する</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if(user.canManageUsers()) {
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">ユーザー管理</h5>
+                                <p class="card-text">システムに登録されているユーザーを管理できます。</p>
+                                <a href="@routes.UserManagementController.index()" class="btn btn-primary">ユーザー管理画面</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

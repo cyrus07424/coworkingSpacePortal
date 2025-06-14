@@ -9,6 +9,8 @@ create table app_user (
   username                      varchar(255),
   email                         varchar(255),
   password                      varchar(255),
+  role                          varchar(8),
+  constraint ck_app_user_role check ( role in ('ADMIN','STAFF','CUSTOMER')),
   constraint pk_app_user primary key (id)
 );
 
