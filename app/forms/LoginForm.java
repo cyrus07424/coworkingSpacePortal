@@ -1,7 +1,9 @@
 package forms;
 
+import lombok.Data;
 import play.data.validation.Constraints;
 
+@Data
 public class LoginForm {
 
     @Constraints.Required
@@ -9,23 +11,4 @@ public class LoginForm {
 
     @Constraints.Required
     private String password;
-
-    public LoginForm() {
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
