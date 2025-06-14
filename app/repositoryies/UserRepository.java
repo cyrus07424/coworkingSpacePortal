@@ -4,6 +4,7 @@ import io.ebean.DB;
 import models.User;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
@@ -47,5 +48,16 @@ public class UserRepository {
 
     public CompletionStage<Boolean> existsByEmail(String email) {
         return supplyAsync(() -> DB.find(User.class).where().eq("email", email).exists(), executionContext);
+    }
+
+    public CompletionStage<List<User>> findAll() {
+        return supplyAsync(() -> DB.find(User.class).orderBy("username").findList(), executionContext);
+    }
+
+    public CompletionStage<User> update(User user) {
+        return supplyAsync(() -> {
+            user.update();
+            return user;
+        }, executionContext);
     }
 }
