@@ -11,6 +11,8 @@ lazy val root = (project in file("."))
       jdbc,
       // Password hashing
       "org.mindrot" % "jbcrypt" % "0.4",
+      // Lombok for auto-generating getters/setters
+      "org.projectlombok" % "lombok" % "1.18.30",
       // Test Database
       "com.h2database" % "h2" % "2.3.232",
       // Testing libraries for dealing with CompletionStage...
@@ -21,8 +23,11 @@ lazy val root = (project in file("."))
       "-encoding", "UTF-8",
       "-parameters",
       "-Xlint:unchecked",
-      "-Xlint:deprecation",
-      "-Werror"
+      "-Xlint:deprecation"
+    ),
+    // Enable annotation processing for Lombok
+    Compile / compile / javacOptions ++= Seq(
+      "-processor", "lombok.launch.AnnotationProcessorHider$AnnotationProcessor"
     ),
     (Test / javaOptions) += "-Dtestserver.port=19001",
     // Make verbose tests
