@@ -19,10 +19,13 @@
             <div class="navbar-nav mr-auto">
                 @if(user.isCustomer()) {
                     <a class="nav-link" href="#">座席予約</a>
-                    <a class="nav-link" href="#">備品レンタル予約</a>
+                    <a class="nav-link" href="@routes.EquipmentReservationController.index()">備品レンタル予約</a>
                 }
                 @if(user.canManageUsers()) {
                     <a class="nav-link" href="@routes.UserManagementController.index()">ユーザー管理</a>
+                }
+                @if(user.canManageEquipment()) {
+                    <a class="nav-link" href="@routes.EquipmentController.index()">備品管理</a>
                 }
             </div>
 

@@ -1,0 +1,78 @@
+@(equipmentForm: Form[forms.EquipmentForm], categories: Array[models.EquipmentCategory], currentUser: models.User)(implicit request: Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@implicitField: FieldConstructor = @{
+    FieldConstructor(tags.forms.field_constructor.render)
+}
+
+@mainWithUser(currentUser) {
+
+    @request.flash.asScala().get("error").map { errorFlashValue =>
+        <div class="alert alert-danger" role="alert">
+            @errorFlashValue
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h4>備品登録</h4>
+                </div>
+                <div class="card-body">
+                    @form(action = routes.EquipmentController.create()) {
+                        @CSRF.formField
+                        
+                        @inputText(equipmentForm("name"), 
+                            Symbol("_label") -> "名前", 
+                            Symbol("_help") -> "備品の名前を入力してください",
+                            Symbol("class") -> "form-control",
+                            Symbol("required") -> "true")
+
+                        @inputText(equipmentForm("purchasePrice"), 
+                            Symbol("_label") -> "購入価格", 
+                            Symbol("_help") -> "購入時の価格を入力してください（数値のみ）",
+                            Symbol("class") -> "form-control",
+                            Symbol("type") -> "number",
+                            Symbol("step") -> "0.01",
+                            Symbol("min") -> "0",
+                            Symbol("required") -> "true")
+
+                        <div class="form-group">
+                            <label for="category">カテゴリ</label>
+                            <select name="category" id="category" class="form-control" required>
+                                <option value="">-- カテゴリを選択 --</option>
+                                @for(category <- categories) {
+                                    <option value="@category.name()" @if(equipmentForm("category").value.contains(category.name())) {selected}>
+                                        @category.getDisplayName()
+                                    </option>
+                                }
+                            </select>
+                            @if(equipmentForm("category").hasErrors) {
+                                <div class="text-danger">
+                                    @for(error <- equipmentForm("category").errors) {
+                                        @error.message
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @textarea(equipmentForm("description"), 
+                            Symbol("_label") -> "説明", 
+                            Symbol("_help") -> "備品の説明（任意）",
+                            Symbol("class") -> "form-control",
+                            Symbol("rows") -> "4")
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">登録</button>
+                            <a href="@routes.EquipmentController.index()" class="btn btn-secondary">キャンセル</a>
+                        </div>
+                        
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+}

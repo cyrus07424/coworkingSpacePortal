@@ -1,0 +1,79 @@
+@(equipmentList: List[models.Equipment], currentUser: models.User)(implicit request: Http.Request, messages: play.i18n.Messages)
+
+@import helper._
+
+@implicitField: FieldConstructor = @{
+    FieldConstructor(tags.forms.field_constructor.render)
+}
+
+@mainWithUser(currentUser) {
+
+    @request.flash.asScala().get("success").map { successFlashValue =>
+        <div class="alert alert-success" role="alert">
+            @successFlashValue
+        </div>
+    }
+
+    @request.flash.asScala().get("error").map { errorFlashValue =>
+        <div class="alert alert-danger" role="alert">
+            @errorFlashValue
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3>備品管理</h3>
+                    <a href="@routes.EquipmentController.showCreate()" class="btn btn-primary">備品を登録</a>
+                </div>
+                <div class="card-body">
+                    @if(equipmentList.isEmpty) {
+                        <p>備品が登録されていません。</p>
+                    } else {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>名前</th>
+                                        <th>購入価格</th>
+                                        <th>カテゴリ</th>
+                                        <th>説明</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for(equipment <- equipmentList) {
+                                        <tr>
+                                            <td>@equipment.getId()</td>
+                                            <td>@equipment.getName()</td>
+                                            <td>¥@equipment.getPurchasePrice()</td>
+                                            <td>
+                                                <span class="badge badge-info">@equipment.getCategory().getDisplayName()</span>
+                                            </td>
+                                            <td>
+                                                @if(equipment.getDescription() != null && equipment.getDescription().length() > 50) {
+                                                    @equipment.getDescription().substring(0, 50)...
+                                                } else {
+                                                    @equipment.getDescription()
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@routes.EquipmentController.showEdit(equipment.getId())" class="btn btn-sm btn-outline-primary">編集</a>
+                                                <a href="@routes.EquipmentController.delete(equipment.getId())" 
+                                                   class="btn btn-sm btn-outline-danger"
+                                                   onclick="return confirm('本当に削除しますか？');">削除</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
