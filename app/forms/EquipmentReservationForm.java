@@ -1,5 +1,7 @@
 package forms;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import play.data.validation.Constraints;
 import play.data.validation.ValidationError;
 
@@ -9,6 +11,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
 public class EquipmentReservationForm {
 
     @Constraints.Required
@@ -17,28 +21,9 @@ public class EquipmentReservationForm {
     @Constraints.Required
     private String reservationDate;
 
-    public EquipmentReservationForm() {
-    }
-
     public EquipmentReservationForm(Long equipmentId, LocalDate reservationDate) {
         this.equipmentId = equipmentId != null ? equipmentId.toString() : "";
         this.reservationDate = reservationDate != null ? reservationDate.toString() : "";
-    }
-
-    public String getEquipmentId() {
-        return equipmentId;
-    }
-
-    public void setEquipmentId(String equipmentId) {
-        this.equipmentId = equipmentId;
-    }
-
-    public String getReservationDate() {
-        return reservationDate;
-    }
-
-    public void setReservationDate(String reservationDate) {
-        this.reservationDate = reservationDate;
     }
 
     public Long getEquipmentIdAsLong() {
