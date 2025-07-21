@@ -12,6 +12,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import repositoryies.UserRepository;
+import services.ConfigService;
 import views.html.auth.login;
 import views.html.auth.register;
 
@@ -28,16 +29,19 @@ public class AuthController extends Controller {
     private final FormFactory formFactory;
     private final ClassLoaderExecutionContext classLoaderExecutionContext;
     private final MessagesApi messagesApi;
+    private final ConfigService configService;
 
     @Inject
     public AuthController(UserRepository userRepository,
                           FormFactory formFactory,
                           ClassLoaderExecutionContext classLoaderExecutionContext,
-                          MessagesApi messagesApi) {
+                          MessagesApi messagesApi,
+                          ConfigService configService) {
         this.userRepository = userRepository;
         this.formFactory = formFactory;
         this.classLoaderExecutionContext = classLoaderExecutionContext;
         this.messagesApi = messagesApi;
+        this.configService = configService;
     }
 
     /**
@@ -111,6 +115,17 @@ public class AuthController extends Controller {
         }
 
         RegisterForm data = registerForm.get();
+
+        // Check if Terms of Service agreement is required and provided
+        if (configService.hasTermsOfServiceUrl() && !data.isTermsAgreed()) {
+            return CompletableFuture.completedFuture(
+                    badRequest(register.render(
+                            registerForm.withError("termsAgreement", "利用規約に同意してください"),
+                            request,
+                            messagesApi.preferred(request)
+                    ))
+            );
+        }
 
         // Check if passwords match
         if (!data.passwordsMatch()) {

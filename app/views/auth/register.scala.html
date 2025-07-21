@@ -56,6 +56,22 @@
                         @inputPassword(registerForm("confirmPassword"), Symbol("_label") -> "パスワード確認", Symbol("class") -> "form-control")
                         </div>
 
+                        @defining(Option(System.getenv("TERMS_OF_SERVICE_URL")).filter(_.trim.nonEmpty)) { termsUrl =>
+                            @termsUrl.map { url =>
+                                <div class="form-group mb-3">
+                                    <div class="form-check">
+                                        @checkbox(registerForm("termsAgreement"), Symbol("class") -> "form-check-input", Symbol("id") -> "termsAgreement")
+                                        <label class="form-check-label" for="termsAgreement">
+                                            <a href="@url" target="_blank">利用規約</a>に同意します
+                                        </label>
+                                    </div>
+                                    @registerForm("termsAgreement").errors.map { error =>
+                                        <div class="text-danger small">@error.message</div>
+                                    }
+                                </div>
+                            }
+                        }
+
                         <button type="submit" class="btn btn-primary">登録</button>
                     }
 

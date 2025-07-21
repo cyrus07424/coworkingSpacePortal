@@ -20,6 +20,9 @@ public class RegisterForm {
     @Constraints.Required
     private String confirmPassword;
 
+    // Optional field for Terms of Service agreement
+    private Boolean termsAgreement;
+
     public RegisterForm() {
     }
 
@@ -57,5 +60,20 @@ public class RegisterForm {
 
     public boolean passwordsMatch() {
         return password != null && password.equals(confirmPassword);
+    }
+
+    public Boolean getTermsAgreement() {
+        return termsAgreement;
+    }
+
+    public void setTermsAgreement(Boolean termsAgreement) {
+        this.termsAgreement = termsAgreement;
+    }
+
+    /**
+     * Check if terms are agreed to (required when Terms of Service URL is configured)
+     */
+    public boolean isTermsAgreed() {
+        return termsAgreement != null && termsAgreement;
     }
 }
