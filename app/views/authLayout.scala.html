@@ -21,5 +21,31 @@
         @content
         </main>
 
+        @defining(Option(System.getenv("TERMS_OF_SERVICE_URL")).filter(_.trim.nonEmpty)) { termsUrl =>
+            @defining(Option(System.getenv("PRIVACY_POLICY_URL")).filter(_.trim.nonEmpty)) { privacyUrl =>
+                @if(termsUrl.isDefined || privacyUrl.isDefined) {
+                    <footer class="bg-light py-4 mt-5 border-top">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <div class="footer-links">
+                                        @termsUrl.map { url =>
+                                            <a href="@url" target="_blank" class="text-muted mx-3">利用規約</a>
+                                        }
+                                        @privacyUrl.map { url =>
+                                            <a href="@url" target="_blank" class="text-muted mx-3">プライバシーポリシー</a>
+                                        }
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">&copy; 2023 Coworking Space Portal</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+                }
+            }
+        }
+
     </body>
 </html>
