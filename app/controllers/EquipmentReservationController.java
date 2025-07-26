@@ -136,6 +136,9 @@ public class EquipmentReservationController extends Controller {
                     );
 
                     return reservationRepository.insert(reservation).thenApplyAsync(reservationId -> {
+                        // Send Slack notification for equipment reservation (fire and forget)
+                        slackNotificationService.notifyEquipmentReservation(currentUser, equipment.getName(), "備品予約", request);
+                        
                         return Results.redirect(routes.EquipmentReservationController.index())
                             .flashing("success", "備品の予約が完了しました");
                     }, classLoaderExecutionContext.current());
@@ -158,14 +161,27 @@ public class EquipmentReservationController extends Controller {
             );
         }
 
-        return reservationRepository.cancelReservation(id, currentUser).thenApplyAsync(cancelled -> {
-            if (cancelled) {
-                return Results.redirect(routes.EquipmentReservationController.index())
-                    .flashing("success", "予約がキャンセルされました");
-            } else {
-                return Results.redirect(routes.EquipmentReservationController.index())
-                    .flashing("error", "予約のキャンセルに失敗しました");
+        return reservationRepository.findById(id).thenComposeAsync(reservationOptional -> {
+            if (!reservationOptional.isPresent()) {
+                return CompletableFuture.completedFuture(
+                    Results.redirect(routes.EquipmentReservationController.index())
+                        .flashing("error", "予約が見つかりません")
+                );
             }
+            
+            EquipmentReservation reservation = reservationOptional.get();
+            return reservationRepository.cancelReservation(id, currentUser).thenApplyAsync(cancelled -> {
+                if (cancelled) {
+                    // Send Slack notification for reservation cancellation (fire and forget)
+                    slackNotificationService.notifyEquipmentReservation(currentUser, reservation.getEquipment().getName(), "予約キャンセル", request);
+                    
+                    return Results.redirect(routes.EquipmentReservationController.index())
+                        .flashing("success", "予約がキャンセルされました");
+                } else {
+                    return Results.redirect(routes.EquipmentReservationController.index())
+                        .flashing("error", "予約のキャンセルに失敗しました");
+                }
+            }, classLoaderExecutionContext.current());
         }, classLoaderExecutionContext.current());
     }
 }
