@@ -1,0 +1,30 @@
+@(statusCode: Int, message: String)
+
+@authLayout {
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fa fa-exclamation-triangle fa-4x text-warning mb-4"></i>
+                        <h2 class="card-title text-danger">エラーが発生しました</h2>
+                        <p class="card-text text-muted mb-4">
+                            @if(statusCode >= 500) {
+                                申し訳ございません。システムエラーが発生いたしました。<br>
+                                しばらく時間を置いてから再度お試しください。
+                            } else {
+                                @message
+                            }
+                        </p>
+                        <div class="mb-3">
+                            <small class="text-muted">エラーコード: @statusCode</small>
+                        </div>
+                        <a href="@routes.HomeController.index()" class="btn btn-primary">
+                            <i class="fa fa-home"></i> トップページに戻る
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
