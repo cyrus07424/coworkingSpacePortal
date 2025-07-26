@@ -15,6 +15,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import repositoryies.EquipmentRepository;
+import services.SlackNotificationService;
 
 import javax.inject.Inject;
 import java.util.concurrent.CompletableFuture;
@@ -29,16 +30,19 @@ public class EquipmentController extends Controller {
     private final FormFactory formFactory;
     private final ClassLoaderExecutionContext classLoaderExecutionContext;
     private final MessagesApi messagesApi;
+    private final SlackNotificationService slackNotificationService;
 
     @Inject
     public EquipmentController(EquipmentRepository equipmentRepository,
                                FormFactory formFactory,
                                ClassLoaderExecutionContext classLoaderExecutionContext,
-                               MessagesApi messagesApi) {
+                               MessagesApi messagesApi,
+                               SlackNotificationService slackNotificationService) {
         this.equipmentRepository = equipmentRepository;
         this.formFactory = formFactory;
         this.classLoaderExecutionContext = classLoaderExecutionContext;
         this.messagesApi = messagesApi;
+        this.slackNotificationService = slackNotificationService;
     }
 
     /**
@@ -108,6 +112,9 @@ public class EquipmentController extends Controller {
         );
 
         return equipmentRepository.insert(equipment).thenApplyAsync(equipmentId -> {
+            // Send Slack notification for equipment creation (fire and forget)
+            slackNotificationService.notifyEquipmentOperation(currentUser, equipmentForm.getName(), "備品登録", request);
+            
             return Results.redirect(routes.EquipmentController.index())
                 .flashing("success", "備品が登録されました");
         }, classLoaderExecutionContext.current());
@@ -184,6 +191,9 @@ public class EquipmentController extends Controller {
             equipment.setCategory(equipmentForm.getCategoryAsEnum());
 
             return equipmentRepository.update(equipment).thenApplyAsync(updatedEquipment -> {
+                // Send Slack notification for equipment update (fire and forget)
+                slackNotificationService.notifyEquipmentOperation(currentUser, equipment.getName(), "備品更新", request);
+                
                 return Results.redirect(routes.EquipmentController.index())
                     .flashing("success", "備品が更新されました");
             }, classLoaderExecutionContext.current());
@@ -204,14 +214,27 @@ public class EquipmentController extends Controller {
             );
         }
 
-        return equipmentRepository.delete(id).thenApplyAsync(deleted -> {
-            if (deleted) {
-                return Results.redirect(routes.EquipmentController.index())
-                    .flashing("success", "備品が削除されました");
-            } else {
-                return Results.redirect(routes.EquipmentController.index())
-                    .flashing("error", "備品の削除に失敗しました");
+        return equipmentRepository.findById(id).thenComposeAsync(equipmentOptional -> {
+            if (!equipmentOptional.isPresent()) {
+                return CompletableFuture.completedFuture(
+                    Results.redirect(routes.EquipmentController.index())
+                        .flashing("error", "備品が見つかりません")
+                );
             }
+            
+            Equipment equipment = equipmentOptional.get();
+            return equipmentRepository.delete(id).thenApplyAsync(deleted -> {
+                if (deleted) {
+                    // Send Slack notification for equipment deletion (fire and forget)
+                    slackNotificationService.notifyEquipmentOperation(currentUser, equipment.getName(), "備品削除", request);
+                    
+                    return Results.redirect(routes.EquipmentController.index())
+                        .flashing("success", "備品が削除されました");
+                } else {
+                    return Results.redirect(routes.EquipmentController.index())
+                        .flashing("error", "備品の削除に失敗しました");
+                }
+            }, classLoaderExecutionContext.current());
         }, classLoaderExecutionContext.current());
     }
 }

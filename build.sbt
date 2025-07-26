@@ -9,6 +9,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       guice,
       jdbc,
+      ws, // HTTP client for Slack webhooks
       // Password hashing
       "org.mindrot" % "jbcrypt" % "0.4",
       // Test Database
@@ -16,6 +17,7 @@ lazy val root = (project in file("."))
       // Testing libraries for dealing with CompletionStage...
       "org.assertj" % "assertj-core" % "3.26.3" % Test,
       "org.awaitility" % "awaitility" % "4.2.2" % Test,
+      "org.mockito" % "mockito-core" % "5.8.0" % Test,
     ),
     javacOptions ++= Seq(
       "-encoding", "UTF-8",

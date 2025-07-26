@@ -13,6 +13,7 @@ import play.mvc.Result;
 import play.mvc.Results;
 import repositoryies.UserRepository;
 import services.ConfigService;
+import services.SlackNotificationService;
 import views.html.auth.login;
 import views.html.auth.register;
 
@@ -30,18 +31,21 @@ public class AuthController extends Controller {
     private final ClassLoaderExecutionContext classLoaderExecutionContext;
     private final MessagesApi messagesApi;
     private final ConfigService configService;
+    private final SlackNotificationService slackNotificationService;
 
     @Inject
     public AuthController(UserRepository userRepository,
                           FormFactory formFactory,
                           ClassLoaderExecutionContext classLoaderExecutionContext,
                           MessagesApi messagesApi,
-                          ConfigService configService) {
+                          ConfigService configService,
+                          SlackNotificationService slackNotificationService) {
         this.userRepository = userRepository;
         this.formFactory = formFactory;
         this.classLoaderExecutionContext = classLoaderExecutionContext;
         this.messagesApi = messagesApi;
         this.configService = configService;
+        this.slackNotificationService = slackNotificationService;
     }
 
     /**
@@ -75,6 +79,9 @@ public class AuthController extends Controller {
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
                 if (user.checkPassword(data.getPassword())) {
+                    // Send Slack notification for login (fire and forget)
+                    slackNotificationService.notifyUserLogin(user, request);
+                    
                     return Results.redirect(routes.HomeController.index())
                             .addingToSession(request, "userId", user.getId().toString())
                             .flashing("success", "ログインしました");
@@ -164,6 +171,9 @@ public class AuthController extends Controller {
                 // Create new user
                 User user = new User(data.getUsername(), data.getEmail(), data.getPassword());
                 return userRepository.insert(user).thenApplyAsync(userId -> {
+                    // Send Slack notification for registration (fire and forget)
+                    slackNotificationService.notifyUserRegistration(user, request);
+                    
                     return Results.redirect(routes.HomeController.index())
                             .addingToSession(request, "userId", userId.toString())
                             .flashing("success", "アカウントが作成されました");
