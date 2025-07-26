@@ -14,6 +14,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 import repositoryies.UserRepository;
+import services.SlackNotificationService;
 import views.html.user.management;
 import views.html.user.createStaff;
 
@@ -30,16 +31,19 @@ public class UserManagementController extends Controller {
     private final FormFactory formFactory;
     private final ClassLoaderExecutionContext classLoaderExecutionContext;
     private final MessagesApi messagesApi;
+    private final SlackNotificationService slackNotificationService;
 
     @Inject
     public UserManagementController(UserRepository userRepository,
                                     FormFactory formFactory,
                                     ClassLoaderExecutionContext classLoaderExecutionContext,
-                                    MessagesApi messagesApi) {
+                                    MessagesApi messagesApi,
+                                    SlackNotificationService slackNotificationService) {
         this.userRepository = userRepository;
         this.formFactory = formFactory;
         this.classLoaderExecutionContext = classLoaderExecutionContext;
         this.messagesApi = messagesApi;
+        this.slackNotificationService = slackNotificationService;
     }
 
     /**
@@ -130,6 +134,9 @@ public class UserManagementController extends Controller {
                 // Create new staff user
                 User user = new User(data.getUsername(), data.getEmail(), data.getPassword(), UserRole.STAFF);
                 return userRepository.insert(user).thenApplyAsync(userId -> {
+                    // Send Slack notification for staff creation (fire and forget)
+                    slackNotificationService.notifyUserUpdate(currentUser, user, "スタッフユーザー作成", request);
+                    
                     return Results.redirect(routes.UserManagementController.index())
                         .flashing("success", "スタッフユーザーが作成されました");
                 }, classLoaderExecutionContext.current());

@@ -16,6 +16,7 @@ import play.mvc.Result;
 import play.mvc.Results;
 import repositoryies.EquipmentRepository;
 import repositoryies.EquipmentReservationRepository;
+import services.SlackNotificationService;
 
 import javax.inject.Inject;
 import java.util.concurrent.CompletableFuture;
@@ -31,18 +32,21 @@ public class EquipmentReservationController extends Controller {
     private final FormFactory formFactory;
     private final ClassLoaderExecutionContext classLoaderExecutionContext;
     private final MessagesApi messagesApi;
+    private final SlackNotificationService slackNotificationService;
 
     @Inject
     public EquipmentReservationController(EquipmentRepository equipmentRepository,
                                           EquipmentReservationRepository reservationRepository,
                                           FormFactory formFactory,
                                           ClassLoaderExecutionContext classLoaderExecutionContext,
-                                          MessagesApi messagesApi) {
+                                          MessagesApi messagesApi,
+                                          SlackNotificationService slackNotificationService) {
         this.equipmentRepository = equipmentRepository;
         this.reservationRepository = reservationRepository;
         this.formFactory = formFactory;
         this.classLoaderExecutionContext = classLoaderExecutionContext;
         this.messagesApi = messagesApi;
+        this.slackNotificationService = slackNotificationService;
     }
 
     /**
