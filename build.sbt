@@ -12,6 +12,8 @@ lazy val root = (project in file("."))
       ws, // HTTP client for Slack webhooks
       // Password hashing
       "org.mindrot" % "jbcrypt" % "0.4",
+      // Email functionality
+      "com.sun.mail" % "jakarta.mail" % "2.0.1",
       // Test Database
       "com.h2database" % "h2" % "2.3.232",
       // Testing libraries for dealing with CompletionStage...
