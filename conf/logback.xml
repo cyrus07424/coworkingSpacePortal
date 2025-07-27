@@ -33,11 +33,16 @@
 
   <logger name="play" level="INFO"/>
   <logger name="application" level="DEBUG"/>
+  <logger name="controllers" level="DEBUG"/>
+  <logger name="repositoryies" level="DEBUG"/>
+  <logger name="services" level="DEBUG"/>
+  <logger name="models" level="DEBUG"/>
+  <logger name="root" level="DEBUG"/>
 
   <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
   <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF"/>
 
-  <root level="WARN">
+  <root level="ERROR">
     <appender-ref ref="ASYNCFILE"/>
     <appender-ref ref="ASYNCSTDOUT"/>
   </root>
